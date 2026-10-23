@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package fluxgate.v1;
+
+option go_package = "fluxgate/api/proto/fluxgate/v1;fluxgatev1";
+
+service QuotaAllocatorService {
+  rpc AcquireGrant(AcquireGrantRequest) returns (AcquireGrantResponse);
+  rpc ReportConsumption(ReportConsumptionRequest) returns (ReportConsumptionResponse);
+  rpc GetAllocatorStatus(GetAllocatorStatusRequest) returns (GetAllocatorStatusResponse);
+}
+
+enum GrantStatus {
+  GRANT_STATUS_UNSPECIFIED = 0;
+  GRANT_STATUS_OK = 1;
+  GRANT_STATUS_EXHAUSTED = 2;
+  GRANT_STATUS_POLICY_MISMATCH = 3;
+  GRANT_STATUS_INVALID_REQUEST = 4;
+}
+
+message AcquireGrantRequest {
+  string request_id = 1;
+  string node_id = 2;
+  string incarnation_id = 3;
+  string policy_id = 4;
+  uint32 policy_version = 5;
+  uint64 requested_credits = 6;
+}
+
+message AcquireGrantResponse {
+  string request_id = 1;
+  string grant_id = 2;
+  uint64 granted_credits = 3;
+  GrantStatus status = 4;
+  string message = 5;
+  uint64 valid_duration_ms = 6;
+  string epoch_id = 7;
+}
+
+message GrantConsumptionReport {
+  string grant_id = 1;
+  uint64 cumulative_consumed = 2;
+}
+
+message ReportConsumptionRequest {
+  string node_id = 1;
+  string incarnation_id = 2;
+  repeated GrantConsumptionReport reports = 3;
+}
+
+enum ReportStatus {
+  REPORT_STATUS_UNSPECIFIED = 0;
+  REPORT_STATUS_OK = 1;
+  REPORT_STATUS_STALE = 2;
+  REPORT_STATUS_GRANT_NOT_FOUND = 3;
+  REPORT_STATUS_EXCEEDS_GRANT = 4;
+  REPORT_STATUS_INCARNATION_MISMATCH = 5;
+}
+
+message ReconciledGrant {
+  string grant_id = 1;
+  uint64 accepted_cumulative_consumed = 2;
+  ReportStatus status = 3;
+  string error_message = 4;
+}
+
+message ReportConsumptionResponse {
+  repeated ReconciledGrant results = 1;
+}
+
+message PolicyStatusInfo {
+  string policy_id = 1;
+  uint32 policy_version = 2;
+  uint64 capacity = 3;
+  double refill_rate = 4;
+  uint64 unallocated_tokens = 5;
+  uint64 outstanding_credits = 6;
+  uint64 total_grants_active = 7;
+}
+
+message GetAllocatorStatusRequest {}
+
+message GetAllocatorStatusResponse {
+  string status = 1;
+  string epoch_id = 2;
+  repeated PolicyStatusInfo policies = 3;
+  bool conservation_invariant_satisfied = 4;
+}

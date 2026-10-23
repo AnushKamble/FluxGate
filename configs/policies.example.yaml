@@ -1,0 +1,31 @@
+# FluxGate Rate Limiting Policies Configuration
+policies:
+  - id: "policy-acme-prod"
+    version: 1
+    client_id: "acme"
+    route: "/api/v1/charge"
+    method: "POST"
+    capacity: 100
+    refill_rate: 20
+    default_cost: 1
+    enabled: true
+
+  - id: "policy-acme-general"
+    version: 1
+    client_id: "acme"
+    route: "*"
+    method: "*"
+    capacity: 200
+    refill_rate: 50
+    default_cost: 1
+    enabled: true
+
+  - id: "policy-global-default"
+    version: 1
+    client_id: "*"
+    route: "*"
+    method: "*"
+    capacity: 50
+    refill_rate: 10
+    default_cost: 1
+    enabled: true

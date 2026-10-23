@@ -1,0 +1,12 @@
+node_id: "node-3"
+http_port: 8083
+grpc_port: 50053
+allocator_addr: "127.0.0.1:50050"
+peers:
+  - "127.0.0.1:50051"
+  - "127.0.0.1:50052"
+lease_refill_batch_size: 10
+lease_low_water_ratio: 0.3
+gossip_interval_ms: 500
+policy_file_path: "configs/policies.example.yaml"
+log_level: "INFO"

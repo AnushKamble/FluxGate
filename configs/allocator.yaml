@@ -1,0 +1,4 @@
+grpc_port: 50050
+http_metrics_port: 8050
+policy_file_path: "configs/policies.example.yaml"
+log_level: "INFO"

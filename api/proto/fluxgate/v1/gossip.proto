@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package fluxgate.v1;
+
+option go_package = "fluxgate/api/proto/fluxgate/v1;fluxgatev1";
+
+service GossipService {
+  rpc SyncTelemetry(SyncTelemetryRequest) returns (SyncTelemetryResponse);
+}
+
+message GCounterState {
+  // Map of component keys (NodeID#IncarnationID) to cumulative monotonic counts
+  map<string, uint64> components = 1;
+}
+
+message SyncTelemetryRequest {
+  string sender_node_id = 1;
+  string sender_incarnation_id = 2;
+  GCounterState allowed_requests = 3;
+  GCounterState denied_requests = 4;
+  GCounterState consumed_credits = 5;
+}
+
+message SyncTelemetryResponse {
+  string receiver_node_id = 1;
+  string receiver_incarnation_id = 2;
+  GCounterState allowed_requests = 3;
+  GCounterState denied_requests = 4;
+  GCounterState consumed_credits = 5;
+}

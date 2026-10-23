@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  allocator:
+    build:
+      context: .
+      dockerfile: Dockerfile.allocator
+    container_name: fluxgate-allocator
+    ports:
+      - "50050:50050"
+      - "8050:8050"
+    volumes:
+      - ./configs:/app/configs:ro
+    command: ["/app/fluxgate-allocator", "-config", "configs/allocator.yaml"]
+    networks:
+      - fluxgate-net
+
+  node-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: fluxgate-node-1
+    ports:
+      - "8081:8081"
+      - "50051:50051"
+    volumes:
+      - ./configs:/app/configs:ro
+    depends_on:
+      - allocator
+    command: ["/app/fluxgate-node", "-config", "configs/node1.yaml"]
+    networks:
+      - fluxgate-net
+
+  node-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: fluxgate-node-2
+    ports:
+      - "8082:8082"
+      - "50052:50052"
+    volumes:
+      - ./configs:/app/configs:ro
+    depends_on:
+      - allocator
+    command: ["/app/fluxgate-node", "-config", "configs/node2.yaml"]
+    networks:
+      - fluxgate-net
+
+  node-3:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: fluxgate-node-3
+    ports:
+      - "8083:8083"
+      - "50053:50053"
+    volumes:
+      - ./configs:/app/configs:ro
+    depends_on:
+      - allocator
+    command: ["/app/fluxgate-node", "-config", "configs/node3.yaml"]
+    networks:
+      - fluxgate-net
+
+networks:
+  fluxgate-net:
+    driver: bridge

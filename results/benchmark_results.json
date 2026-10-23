@@ -1,0 +1,105 @@
+{
+  "timestamp": "2026-10-23T18:25:30Z",
+  "go_version": "go1.27.0",
+  "os": "windows",
+  "arch": "amd64",
+  "cpu_count": 32,
+  "git_revision": "unknown",
+  "experiments": [
+    {
+      "name": "Experiment A: Local Algorithm Baselines",
+      "description": "Sequential latency distributions (p50, p95, p99, p99.9) and throughput for local limiters.",
+      "metrics": {
+        "atomic_p50_ns": 0,
+        "atomic_p95_ns": 0,
+        "atomic_p999_ns": 0,
+        "atomic_p99_ns": 0,
+        "atomic_throughput_ops_sec": 11759725.29281716,
+        "mutex_p50_ns": 0,
+        "mutex_p95_ns": 0,
+        "mutex_p999_ns": 0,
+        "mutex_p99_ns": 0,
+        "mutex_throughput_ops_sec": 20950305.874465767,
+        "sliding_window_p50_ns": 0,
+        "sliding_window_p95_ns": 0,
+        "sliding_window_p999_ns": 0,
+        "sliding_window_p99_ns": 0,
+        "sliding_window_throughput_ops": 11835440.041660748
+      },
+      "pass": true
+    },
+    {
+      "name": "Experiment B: Distributed Credit Conservation Invariant",
+      "description": "Concurrent load against 3 lease-backed nodes with zero refill. Proves global overspend is exactly 0.",
+      "metrics": {
+        "global_capacity": 300,
+        "global_overspend": 0,
+        "total_allowed": 300,
+        "total_denied": 300
+      },
+      "pass": true
+    },
+    {
+      "name": "Experiment C: Duplicate and Out-of-Order Report Accounting",
+      "description": "Demonstrates monotonic cumulative reporting resilience to duplicate and reordered deliveries.",
+      "metrics": {
+        "final_outstanding_credits": 5,
+        "monotonicity_verified": false
+      },
+      "pass": false
+    },
+    {
+      "name": "Experiment D: Partition, Depletion, Heal, and Recovery",
+      "description": "Measures traffic allowed from cached lease, bounded denials after exhaustion, and recovery upon heal.",
+      "metrics": {
+        "allowed_after_heal": 10,
+        "allowed_during_partition": 40,
+        "denied_during_partition": 20,
+        "local_refill_violations": 0
+      },
+      "pass": true
+    },
+    {
+      "name": "Experiment E: Uncoordinated Local Baseline Comparison",
+      "description": "Demonstrates how independent uncoordinated limiters cause N-fold quota overshoot (200% overshoot across 3 nodes).",
+      "metrics": {
+        "actual_allowed_unsafe": 300,
+        "intended_global_capacity": 100,
+        "overshoot_percentage": 200
+      },
+      "pass": true
+    },
+    {
+      "name": "Experiment F: CRDT Telemetry Convergence under Packet Loss",
+      "description": "Measures G-counter eventual convergence after 60% lossy gossip rounds followed by anti-entropy heal.",
+      "metrics": {
+        "converged": true,
+        "expected_aggregate": 1000,
+        "replica_1_total": 1000,
+        "replica_2_total": 1000,
+        "replica_3_total": 1000,
+        "simulated_drops": 5,
+        "simulated_successes": 11
+      },
+      "pass": true
+    },
+    {
+      "name": "Experiment G: Node Restart and Incarnation Binding",
+      "description": "Verifies that restarting a node generates a new incarnation that cannot spend or report stale grants.",
+      "metrics": {
+        "error_code": "INCARNATION_MISMATCH",
+        "stale_report_rejected": true
+      },
+      "pass": true
+    },
+    {
+      "name": "Experiment H: Tenant Skew and High Cardinality Churn",
+      "description": "Simulates 10,000 requests under Zipfian tenant skew; evaluates memory footprint and cardinality stability.",
+      "metrics": {
+        "memory_used_mb": 0.1871490478515625,
+        "total_requests": 10000
+      },
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "scenario_name": "AllocatorPartitionAndExhaustion",
+    "passed": true,
+    "invariant_violations": 0,
+    "observations": "Node spent exactly 20 granted credits during partition, then strictly denied without minting local quota."
+  },
+  {
+    "scenario_name": "PartitionHealAndReconciliation",
+    "passed": true,
+    "invariant_violations": 0,
+    "observations": "Healed link, reconciled monotonic reports, and verified conservation invariant."
+  },
+  {
+    "scenario_name": "GossipPartitionAndConvergence",
+    "passed": true,
+    "invariant_violations": 0,
+    "observations": "Telemetry diverged during partition and converged to exact sum (130) upon healing."
+  },
+  {
+    "scenario_name": "NodeRestartFreshIncarnation",
+    "passed": true,
+    "invariant_violations": 0,
+    "observations": "Allocator successfully rejected stale grant report from new node incarnation."
+  },
+  {
+    "scenario_name": "AllocatorEpochResetProtocol",
+    "passed": true,
+    "invariant_violations": 0,
+    "observations": "Epoch reset safely invalidated pre-crash lease credits, preventing post-restart double minting."
+  }
+]
