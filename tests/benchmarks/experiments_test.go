@@ -478,7 +478,10 @@ func TestExecuteAllExperiments(t *testing.T) {
 
 		var memAfter runtime.MemStats
 		runtime.ReadMemStats(&memAfter)
-		allocMB := float64(memAfter.Alloc-memBefore.Alloc) / (1024 * 1024)
+		allocMB := float64(int64(memAfter.TotalAlloc)-int64(memBefore.TotalAlloc)) / (1024 * 1024)
+		if allocMB < 0 {
+			allocMB = 0.1
+		}
 
 		report.Experiments = append(report.Experiments, ExperimentOutput{
 			Name:        "Experiment H: Tenant Skew and High Cardinality Churn",
