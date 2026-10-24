@@ -1,10 +1,10 @@
 # FluxGate Empirical Benchmark & Experiment Report
 
-**Executed At:** `2026-10-24T06:30:27Z`  
+**Executed At:** `2026-10-24T06:31:17Z`  
 **Host Platform:** `windows / amd64`  
 **CPU Cores:** `32`  
 **Go Version:** `go1.27.0`  
-**Git Revision:** `0ef44e7a9689c9596bd56818392fa68d7ea1de82`  
+**Git Revision:** `64b75f54ce9383116db4cbd81fe205c6a0318144`  
 
 ---
 
@@ -12,7 +12,7 @@
 
 | Experiment | Description | Status | Key Measured Result |
 |---|---|---|---|
-| **Experiment A: Local Algorithm Baselines** | Sequential latency distributions (p50, p95, p99, p99.9) and throughput for local limiters. | **PASS** | Mutex: 12893078 ops/s, Atomic: 10520779 ops/s |
+| **Experiment A: Local Algorithm Baselines** | Sequential latency distributions (p50, p95, p99, p99.9) and throughput for local limiters. | **PASS** | Mutex: 17383444 ops/s, Atomic: 12704220 ops/s |
 | **Experiment B: Distributed Credit Conservation Invariant** | Concurrent load against 3 lease-backed nodes with zero refill. Proves global overspend is exactly 0. | **PASS** | Overspend: 0 (Allowed: 300 / 300) |
 | **Experiment C: Duplicate and Out-of-Order Report Accounting** | Demonstrates monotonic cumulative reporting resilience to duplicate and reordered deliveries. | **PASS** | Monotonicity Verified: true, Outstanding: 5 |
 | **Experiment D: Partition, Depletion, Heal, and Recovery** | Measures traffic allowed from cached lease, bounded denials after exhaustion, and recovery upon heal. | **PASS** | Allowed: 40, Denied: 20, Post-Heal: 10 |

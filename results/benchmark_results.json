@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-10-24T06:30:27Z",
+  "timestamp": "2026-10-24T06:31:17Z",
   "go_version": "go1.27.0",
   "os": "windows",
   "arch": "amd64",
   "cpu_count": 32,
-  "git_revision": "0ef44e7a9689c9596bd56818392fa68d7ea1de82",
+  "git_revision": "64b75f54ce9383116db4cbd81fe205c6a0318144",
   "experiments": [
     {
       "name": "Experiment A: Local Algorithm Baselines",
@@ -14,17 +14,17 @@
         "atomic_p95_ns": 0,
         "atomic_p999_ns": 0,
         "atomic_p99_ns": 0,
-        "atomic_throughput_ops_sec": 10520778.537611784,
+        "atomic_throughput_ops_sec": 12704220.34199761,
         "mutex_p50_ns": 0,
         "mutex_p95_ns": 0,
         "mutex_p999_ns": 0,
         "mutex_p99_ns": 0,
-        "mutex_throughput_ops_sec": 12893077.706579337,
+        "mutex_throughput_ops_sec": 17383444.00792685,
         "sliding_window_p50_ns": 0,
         "sliding_window_p95_ns": 0,
         "sliding_window_p999_ns": 0,
         "sliding_window_p99_ns": 0,
-        "sliding_window_throughput_ops": 11201971.546992272
+        "sliding_window_throughput_ops": 9974067.424695792
       },
       "pass": true
     },
