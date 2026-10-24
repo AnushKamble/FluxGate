@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	ErrDuplicateRequestID     = errors.New("request id already exists")
-	ErrGrantNotFound          = errors.New("grant not found")
-	ErrIncarnationMismatch    = errors.New("grant incarnation does not match node incarnation")
-	ErrReportExceedsGrant     = errors.New("reported cumulative consumption exceeds grant amount")
-	ErrReportNonMonotonic     = errors.New("reported consumption is lower than previously accepted consumption")
-	ErrPolicyVersionMismatch  = errors.New("policy version mismatch")
-	ErrInsufficientHeadroom   = errors.New("insufficient global quota available")
-	ErrNegativeConsumption    = errors.New("reported consumption cannot be negative")
+	ErrDuplicateRequestID    = errors.New("request id already exists")
+	ErrGrantNotFound         = errors.New("grant not found")
+	ErrIncarnationMismatch   = errors.New("grant incarnation does not match node incarnation")
+	ErrReportExceedsGrant    = errors.New("reported cumulative consumption exceeds grant amount")
+	ErrReportNonMonotonic    = errors.New("reported consumption is lower than previously accepted consumption")
+	ErrPolicyVersionMismatch = errors.New("policy version mismatch")
+	ErrInsufficientHeadroom  = errors.New("insufficient global quota available")
+	ErrNegativeConsumption   = errors.New("reported consumption cannot be negative")
 )
 
 // Grant represents an escrowed credit allocation to a specific node incarnation.

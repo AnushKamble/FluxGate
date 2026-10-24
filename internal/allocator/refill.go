@@ -32,21 +32,22 @@ func NewPolicyPool(pol config.PolicyDefinition, initialTime time.Time, epochID s
 // proves that tokens were consumed, that headroom becomes eligible for refill only from
 // that observation timestamp forward. No retroactive refill is minted.
 func (p *PolicyPool) Refill(now time.Time, outstandingUpperBounds uint64) {
-	if now.Before(p.LastRefillTime) {
-		// Clock rollback protection: clamp time progression to 0
-		return
-	}
-
-	elapsedSec := now.Sub(p.LastRefillTime).Seconds()
-	p.LastRefillTime = now
-
-	// Calculate provable headroom
+	// Calculate provable headroom first
 	var headroom float64
 	if outstandingUpperBounds >= p.Policy.Capacity {
 		headroom = 0.0
 	} else {
 		headroom = float64(p.Policy.Capacity - outstandingUpperBounds)
 	}
+
+	if now.Before(p.LastRefillTime) {
+		// Clock rollback protection: do not advance time, clamp to headroom
+		p.UnallocatedTokens = math.Max(0.0, math.Min(headroom, p.UnallocatedTokens))
+		return
+	}
+
+	elapsedSec := now.Sub(p.LastRefillTime).Seconds()
+	p.LastRefillTime = now
 
 	// Calculate unallocated tokens with rate refill
 	potentialTokens := p.UnallocatedTokens + (elapsedSec * p.Policy.RefillRate)

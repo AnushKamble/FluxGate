@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-10-23T18:32:13Z",
+  "timestamp": "2026-10-24T06:30:27Z",
   "go_version": "go1.27.0",
   "os": "windows",
   "arch": "amd64",
   "cpu_count": 32,
-  "git_revision": "59e67ccfe5d50373c01ac45bd8bb783a1634eba4",
+  "git_revision": "0ef44e7a9689c9596bd56818392fa68d7ea1de82",
   "experiments": [
     {
       "name": "Experiment A: Local Algorithm Baselines",
@@ -14,17 +14,17 @@
         "atomic_p95_ns": 0,
         "atomic_p999_ns": 0,
         "atomic_p99_ns": 0,
-        "atomic_throughput_ops_sec": 11788838.327871172,
+        "atomic_throughput_ops_sec": 10520778.537611784,
         "mutex_p50_ns": 0,
         "mutex_p95_ns": 0,
         "mutex_p999_ns": 0,
         "mutex_p99_ns": 0,
-        "mutex_throughput_ops_sec": 21610874.59209474,
+        "mutex_throughput_ops_sec": 12893077.706579337,
         "sliding_window_p50_ns": 0,
         "sliding_window_p95_ns": 0,
         "sliding_window_p999_ns": 0,
         "sliding_window_p99_ns": 0,
-        "sliding_window_throughput_ops": 11206114.05582886
+        "sliding_window_throughput_ops": 11201971.546992272
       },
       "pass": true
     },
@@ -96,7 +96,7 @@
       "name": "Experiment H: Tenant Skew and High Cardinality Churn",
       "description": "Simulates 10,000 requests under Zipfian tenant skew; evaluates memory footprint and cardinality stability.",
       "metrics": {
-        "memory_used_mb": 0.1873626708984375,
+        "memory_used_mb": 0.1871490478515625,
         "total_requests": 10000
       },
       "pass": true

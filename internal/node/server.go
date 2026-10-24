@@ -86,7 +86,14 @@ func NewGatewayNode(cfg *config.NodeConfig, clk clock.Clock) (*GatewayNode, erro
 		clk,
 	)
 
+	// Register distributed lease bucket with policy engine so incoming HTTP checks
+	// consume from central escrowed quota rather than an uncoordinated local bucket.
+	if primaryPol.ID != "" {
+		engine.RegisterPolicyLimiter(primaryPol.ID, bucket)
+	}
+
 	apiServer := httpapi.NewServer(cfg.NodeID, engine, clk, logger, metrics)
+	apiServer.SetTelemetryStore(telemetryStore)
 
 	leaseWorker := NewLeaseWorker(
 		cfg.NodeID,

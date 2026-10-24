@@ -162,9 +162,9 @@ func (s *GRPCServer) GetAllocatorStatus(ctx context.Context, req *fluxgatev1.Get
 	}
 
 	return &fluxgatev1.GetAllocatorStatusResponse{
-		Status:                          "OPERATIONAL",
-		EpochId:                         s.coordinator.EpochID(),
-		Policies:                        policies,
+		Status:                         "OPERATIONAL",
+		EpochId:                        s.coordinator.EpochID(),
+		Policies:                       policies,
 		ConservationInvariantSatisfied: ok,
 	}, nil
 }

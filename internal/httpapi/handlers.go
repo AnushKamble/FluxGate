@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"fluxgate/internal/clock"
+	"fluxgate/internal/crdt"
 	"fluxgate/internal/policy"
 	"fluxgate/internal/telemetry"
 )
@@ -18,6 +19,7 @@ type Server struct {
 	clock      clock.Clock
 	logger     *telemetry.Logger
 	metrics    *telemetry.MetricsRegistry
+	telemetry  *crdt.TelemetryStore
 	mux        *http.ServeMux
 	handler    http.Handler
 	isReady    bool
@@ -41,6 +43,10 @@ func NewServer(nodeID string, engine *policy.Engine, clk clock.Clock, logger *te
 	s.routes()
 	s.handler = LoggingAndMetricsMiddleware(logger, metrics, s.mux)
 	return s
+}
+
+func (s *Server) SetTelemetryStore(t *crdt.TelemetryStore) {
+	s.telemetry = t
 }
 
 func (s *Server) Handler() http.Handler {
@@ -127,6 +133,10 @@ func (s *Server) handleCheck(w http.ResponseWriter, r *http.Request) {
 
 	if decision.Allowed {
 		s.metrics.IncDecision(true, pol.ID, "allowed")
+		if s.telemetry != nil {
+			s.telemetry.IncAllowed(1)
+			s.telemetry.IncConsumed(req.Cost)
+		}
 		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(CheckResponse{
 			Allowed:   true,
@@ -146,6 +156,9 @@ func (s *Server) handleCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.metrics.IncDecision(false, pol.ID, "rate_limited")
+	if s.telemetry != nil {
+		s.telemetry.IncDenied(1)
+	}
 	w.WriteHeader(http.StatusTooManyRequests)
 	_ = json.NewEncoder(w).Encode(CheckResponse{
 		Allowed:           false,

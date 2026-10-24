@@ -180,6 +180,24 @@ func (lb *LeaseBucket) PendingReports() []ActiveLeaseGrant {
 	return reports
 }
 
+// AcknowledgeReports prunes fully consumed grants that have been accepted by the allocator,
+// preventing unbounded growth of historical grant state.
+func (lb *LeaseBucket) AcknowledgeReports(reconciled map[string]uint64) {
+	lb.mu.Lock()
+	defer lb.mu.Unlock()
+
+	active := make([]*ActiveLeaseGrant, 0, len(lb.grants))
+	for _, g := range lb.grants {
+		accepted, wasReported := reconciled[g.GrantID]
+		if wasReported && accepted >= g.Amount && g.CumulativeConsumed >= g.Amount {
+			// Grant is completely spent and acknowledged by allocator; safe to prune
+			continue
+		}
+		active = append(active, g)
+	}
+	lb.grants = active
+}
+
 // LowWaterChannel exposes the channel for background worker notifications.
 func (lb *LeaseBucket) LowWaterChannel() <-chan struct{} {
 	return lb.lowWaterChan

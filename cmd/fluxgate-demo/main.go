@@ -155,9 +155,15 @@ func main() {
 	unsafe3 := limiter.NewTokenBucketMutex(100, 0, realClock)
 	totalAllowedUnsafe := 0
 	for i := 0; i < 100; i++ {
-		if unsafe1.Allow() { totalAllowedUnsafe++ }
-		if unsafe2.Allow() { totalAllowedUnsafe++ }
-		if unsafe3.Allow() { totalAllowedUnsafe++ }
+		if unsafe1.Allow() {
+			totalAllowedUnsafe++
+		}
+		if unsafe2.Allow() {
+			totalAllowedUnsafe++
+		}
+		if unsafe3.Allow() {
+			totalAllowedUnsafe++
+		}
 	}
 	fmt.Printf("  -> Uncoordinated Model: Allowed %d requests against global quota of 100 (+200%% OVERSHOOT!)\n", totalAllowedUnsafe)
 	fmt.Printf("  -> FluxGate Leased Model: Global Overspend is STRICTLY 0 (Conservation Invariant Satisfied)\n")

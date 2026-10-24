@@ -26,12 +26,13 @@ type MatchKey struct {
 
 // Engine evaluates incoming requests against configured policies and maintains local limiters.
 type Engine struct {
-	mu           sync.RWMutex
-	clock        clock.Clock
-	policies     []config.PolicyDefinition
-	limiters     map[string]limiter.Limiter // key: policy_id + "#" + client_id
-	useAtomic    bool
-	maxClientIDs int                        // Bound memory against high-cardinality attacks
+	mu             sync.RWMutex
+	clock          clock.Clock
+	policies       []config.PolicyDefinition
+	limiters       map[string]limiter.Limiter // key: policy_id + "#" + client_id
+	policyLimiters map[string]limiter.Limiter // key: policy_id -> distributed LeaseBucket
+	useAtomic      bool
+	maxClientIDs   int // Bound memory against high-cardinality attacks
 }
 
 // NewEngine creates a new policy engine.
@@ -43,11 +44,12 @@ func NewEngine(policies []config.PolicyDefinition, clk clock.Clock, useAtomic bo
 		maxClientIDs = 100000
 	}
 	e := &Engine{
-		clock:        clk,
-		policies:     make([]config.PolicyDefinition, len(policies)),
-		limiters:     make(map[string]limiter.Limiter),
-		useAtomic:    useAtomic,
-		maxClientIDs: maxClientIDs,
+		clock:          clk,
+		policies:       make([]config.PolicyDefinition, len(policies)),
+		limiters:       make(map[string]limiter.Limiter),
+		policyLimiters: make(map[string]limiter.Limiter),
+		useAtomic:      useAtomic,
+		maxClientIDs:   maxClientIDs,
 	}
 	copy(e.policies, policies)
 
@@ -163,6 +165,13 @@ func (e *Engine) GetOrCreateLimiter(p *config.PolicyDefinition, clientID string)
 	return l, nil
 }
 
+// RegisterPolicyLimiter sets a policy-level distributed limiter (e.g., LeaseBucket).
+func (e *Engine) RegisterPolicyLimiter(policyID string, l limiter.Limiter) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.policyLimiters[policyID] = l
+}
+
 // Evaluate performs a complete match and rate check for an incoming request.
 func (e *Engine) Evaluate(now time.Time, key MatchKey, cost uint64) (limiter.Decision, *config.PolicyDefinition, error) {
 	p, err := e.Match(key)
@@ -170,13 +179,24 @@ func (e *Engine) Evaluate(now time.Time, key MatchKey, cost uint64) (limiter.Dec
 		return limiter.Decision{}, nil, err
 	}
 
+	if cost == 0 {
+		cost = p.DefaultCost
+	}
+
+	// 1. Check if a distributed policy limiter (LeaseBucket) is registered
+	e.mu.RLock()
+	polLimiter, hasPolLimiter := e.policyLimiters[p.ID]
+	e.mu.RUnlock()
+
+	if hasPolLimiter {
+		decision := polLimiter.Check(now, cost)
+		return decision, p, nil
+	}
+
+	// 2. Fall back to local standalone limiter per client
 	l, err := e.GetOrCreateLimiter(p, key.ClientID)
 	if err != nil {
 		return limiter.Decision{}, p, err
-	}
-
-	if cost == 0 {
-		cost = p.DefaultCost
 	}
 
 	decision := l.Check(now, cost)

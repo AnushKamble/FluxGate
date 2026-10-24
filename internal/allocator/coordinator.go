@@ -30,10 +30,10 @@ type ReportItem struct {
 
 // ReconcileResult reports the outcome for an individual grant consumption report.
 type ReconcileResult struct {
-	GrantID                  string
-	AcceptedConsumed         uint64
-	Status                   string // "OK", "STALE", "EXCEEDS_GRANT", "INCARNATION_MISMATCH", "NOT_FOUND"
-	ErrorMessage             string
+	GrantID          string
+	AcceptedConsumed uint64
+	Status           string // "OK", "STALE", "EXCEEDS_GRANT", "INCARNATION_MISMATCH", "NOT_FOUND"
+	ErrorMessage     string
 }
 
 // Coordinator is the thread-safe central Quota Allocator authority.

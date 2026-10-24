@@ -26,6 +26,7 @@ type LeaseWorker struct {
 	conn          *grpc.ClientConn
 	lastEpochID   string
 	stopChan      chan struct{}
+	stopOnce      sync.Once
 	wg            sync.WaitGroup
 	onDegraded    func(bool)
 }
@@ -80,11 +81,13 @@ func (w *LeaseWorker) Start(ctx context.Context) error {
 }
 
 func (w *LeaseWorker) Stop() {
-	close(w.stopChan)
-	w.wg.Wait()
-	if w.conn != nil {
-		_ = w.conn.Close()
-	}
+	w.stopOnce.Do(func() {
+		close(w.stopChan)
+		w.wg.Wait()
+		if w.conn != nil {
+			_ = w.conn.Close()
+		}
+	})
 }
 
 func (w *LeaseWorker) runLoop(ctx context.Context) {
@@ -210,7 +213,7 @@ func (w *LeaseWorker) flushReports(ctx context.Context) {
 	reqCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 
-	_, err := w.client.ReportConsumption(reqCtx, &fluxgatev1.ReportConsumptionRequest{
+	resp, err := w.client.ReportConsumption(reqCtx, &fluxgatev1.ReportConsumptionRequest{
 		NodeId:        w.nodeID,
 		IncarnationId: w.incarnationID,
 		Reports:       reqReports,
@@ -224,6 +227,16 @@ func (w *LeaseWorker) flushReports(ctx context.Context) {
 	} else {
 		if w.onDegraded != nil {
 			w.onDegraded(false)
+		}
+		// Prune fully spent and acknowledged grants
+		if resp != nil && len(resp.Results) > 0 {
+			ackMap := make(map[string]uint64, len(resp.Results))
+			for _, res := range resp.Results {
+				if res.Status == fluxgatev1.ReportStatus_REPORT_STATUS_OK || res.Status == fluxgatev1.ReportStatus_REPORT_STATUS_STALE {
+					ackMap[res.GrantId] = res.AcceptedCumulativeConsumed
+				}
+			}
+			w.bucket.AcknowledgeReports(ackMap)
 		}
 	}
 }

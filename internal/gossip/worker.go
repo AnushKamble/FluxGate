@@ -21,6 +21,7 @@ type GossipWorker struct {
 	interval      time.Duration
 	logger        *telemetry.Logger
 	stopChan      chan struct{}
+	stopOnce      sync.Once
 	wg            sync.WaitGroup
 	peerConns     map[string]*grpc.ClientConn
 	mu            sync.Mutex
@@ -55,14 +56,16 @@ func (gw *GossipWorker) Start(ctx context.Context) {
 }
 
 func (gw *GossipWorker) Stop() {
-	close(gw.stopChan)
-	gw.wg.Wait()
+	gw.stopOnce.Do(func() {
+		close(gw.stopChan)
+		gw.wg.Wait()
 
-	gw.mu.Lock()
-	defer gw.mu.Unlock()
-	for _, conn := range gw.peerConns {
-		_ = conn.Close()
-	}
+		gw.mu.Lock()
+		defer gw.mu.Unlock()
+		for _, conn := range gw.peerConns {
+			_ = conn.Close()
+		}
+	})
 }
 
 func (gw *GossipWorker) run(ctx context.Context) {
