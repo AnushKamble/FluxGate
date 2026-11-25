@@ -1,6 +1,6 @@
-# FluxGate — Partition-Aware Distributed Rate Limiting & Quota Management
+﻿# FluxGate â€” Partition-Aware Distributed Rate Limiting & Quota Management
 
-[![CI](https://github.com/fluxgate/fluxgate/actions/workflows/ci.yml/badge.svg)](https://github.com/fluxgate/fluxgate/actions/workflows/ci.yml)
+[![CI](https://github.com/AnushKamble/FluxGate/actions/workflows/ci.yml/badge.svg)](https://github.com/AnushKamble/FluxGate/actions/workflows/ci.yml)
 [![Go Version](https://img.shields.io/badge/go-1.22%2B-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -164,12 +164,12 @@ go test -v ./tests/hardening/...
 
 ## Repository Documentation Index
 
-- [Architecture Guide](docs/architecture.md) — Subsystem designs, component models, and data flows.
-- [Formal Invariants](docs/invariants.md) — Mathematical proofs and conservation guarantees.
-- [Wire Protocol Specification](docs/protocol.md) — gRPC schemas, HTTP endpoints, and RFC 6585 compliance.
-- [Failure Modes & Degraded States](docs/failure-modes.md) — Partition, node crash, and recovery behaviors.
-- [Benchmark Methodology](docs/benchmark-methodology.md) — Measurement methodology and percentile calculations.
-- [Benchmark Report](docs/benchmark-report.md) — Exact machine-generated results and platform metadata.
-- [Architecture Decision Log](docs/decision-log.md) — ADRs covering escrow design, reporting, and transport.
-- [Limitations & Trade-offs](docs/limitations.md) — Candid analysis of safety vs availability and in-memory control plane.
-- [Interactive Demo Walkthrough](docs/demo-script.md) — Step-by-step 60-90s scripted guide.
+- [Architecture Guide](docs/architecture.md) â€” Subsystem designs, component models, and data flows.
+- [Formal Invariants](docs/invariants.md) â€” Mathematical proofs and conservation guarantees.
+- [Wire Protocol Specification](docs/protocol.md) â€” gRPC schemas, HTTP endpoints, and RFC 6585 compliance.
+- [Failure Modes & Degraded States](docs/failure-modes.md) â€” Partition, node crash, and recovery behaviors.
+- [Benchmark Methodology](docs/benchmark-methodology.md) â€” Measurement methodology and percentile calculations.
+- [Benchmark Report](docs/benchmark-report.md) â€” Exact machine-generated results and platform metadata.
+- [Architecture Decision Log](docs/decision-log.md) â€” ADRs covering escrow design, reporting, and transport.
+- [Limitations & Trade-offs](docs/limitations.md) â€” Candid analysis of safety vs availability and in-memory control plane.
+- [Interactive Demo Walkthrough](docs/demo-script.md) â€” Step-by-step 60-90s scripted guide.
