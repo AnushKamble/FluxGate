@@ -3,7 +3,7 @@
 ## ADR-001: Separation of Enforcement (Escrowed Leases) and Telemetry (CRDT G-Counter)
 - **Status**: Accepted
 - **Context**: In a distributed rate-limiting system across multiple gateway nodes, making a remote RPC on every incoming API request causes latency inflation and tight availability coupling. Conversely, allowing uncoordinated local refill or relying on asynchronous gossip counters for authorization causes dangerous quota overspending during partitions or replication lag.
-- **Decision**: 
+- **Decision**:
   1. Quota enforcement is strictly based on finite, centrally accounted leases (escrowed token credits). Nodes can only spend credits explicitly transferred to their unique incarnation ID.
   2. Telemetry and observability use a grow-only counter (G-counter) CRDT replicated via asynchronous anti-entropy gRPC rounds.
   3. CRDT state is NEVER used as an authorization oracle to mint or extend quota credits.
@@ -16,7 +16,7 @@
 ## ADR-002: Monotonic Cumulative Reporting Keyed by Grant ID
 - **Status**: Accepted
 - **Context**: Network packets can be duplicated, delayed, or reordered. If nodes report incremental deltas (e.g., "consumed 5 tokens"), packet retries or duplicates would lead to double-decrementing the allocator's outstanding balance, causing premature and illegal quota expansion.
-- **Decision**: 
+- **Decision**:
   - Nodes maintain a monotonic cumulative consumption counter per grant ID (`cumulative_consumed`).
   - Consumption reports send the current total consumed for that grant ID.
   - The allocator validates $0 \le \text{cumulative\_consumed} \le \text{grant\_amount}$ and updates the accepted consumption to $\max(\text{previous\_accepted}, \text{cumulative\_consumed})$.

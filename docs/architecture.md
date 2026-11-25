@@ -11,36 +11,36 @@ The core architectural principle separates:
 ```mermaid
 flowchart TD
     Client["API Client / Consumer"] -->|POST /api/v1/check| NodeHTTP["Node HTTP Gateway (/api/v1/check)"]
-    
+
     subgraph FluxGateNode["FluxGate Node (Data Plane)"]
         NodeHTTP -->|1. Match Policy| PolicyEngine["Policy Engine"]
         PolicyEngine -->|2. Check/Spend Lease Token| LocalLimiter["Local Limiter (Token Bucket / Lease)"]
         LocalLimiter -->|3. Record Allowed/Denied| TelemetryStore["CRDT Telemetry Store (G-Counter)"]
         LocalLimiter -->|4. Allow / Deny (429)| NodeHTTP
-        
+
         subgraph BackgroundWorkers["Background Async Workers"]
             LeaseWorker["Lease Manager Worker"]
             GossipWorker["Anti-Entropy Gossip Worker"]
         end
-        
+
         LocalLimiter -.->|Low-water trigger| LeaseWorker
         TelemetryStore -.->|Periodic anti-entropy| GossipWorker
     end
-    
+
     subgraph ControlPlane["Quota Allocator (Control Plane)"]
         AllocatorServer["Allocator gRPC Service"]
         EscrowLedger["Escrow Ledger & Invariant Guard"]
         GlobalBucket["Global Refill Token Bucket"]
-        
+
         AllocatorServer --> EscrowLedger
         EscrowLedger --> GlobalBucket
     end
-    
+
     subgraph PeerNodes["Peer Cluster Nodes"]
         PeerNode1["Peer Node B"]
         PeerNode2["Peer Node C"]
     end
-    
+
     LeaseWorker ==="Async Lease Request / Monotonic Report (gRPC)"===> AllocatorServer
     GossipWorker <.-."Asynchronous CRDT State Sync (gRPC)".-> PeerNode1
     GossipWorker <.-."Asynchronous CRDT State Sync (gRPC)".-> PeerNode2

@@ -1,11 +1,11 @@
-﻿# FluxGate â€” Partition-Aware Distributed Rate Limiting & Quota Management
+﻿# FluxGate — Partition-Aware Distributed Rate Limiting & Quota Management
 
 [![CI](https://github.com/AnushKamble/FluxGate/actions/workflows/ci.yml/badge.svg)](https://github.com/AnushKamble/FluxGate/actions/workflows/ci.yml)
 [![Go Version](https://img.shields.io/badge/go-1.22%2B-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-> **Central Architectural Thesis**:  
-> **Use finite, centrally accounted quota leases (escrowed token credits) for enforcement; use asynchronous CRDT replication for eventually consistent usage telemetry.**  
+> **Central Architectural Thesis**:
+> **Use finite, centrally accounted quota leases (escrowed token credits) for enforcement; use asynchronous CRDT replication for eventually consistent usage telemetry.**
 > Local request decisions NEVER perform a cross-node RPC. Nodes serve from valid local credits. When credits run out during communication failures, nodes throttle or reject requests rather than silently minting global quota. This guarantees zero quota overspend during network partitions.
 
 ---
@@ -15,36 +15,36 @@
 ```mermaid
 flowchart TD
     Client["API Client / Consumer"] -->|POST /api/v1/check| NodeHTTP["Node HTTP Gateway (/api/v1/check)"]
-    
+
     subgraph FluxGateNode["FluxGate Gateway Node (Data Plane)"]
         NodeHTTP -->|1. Resolve Policy| PolicyEngine["Policy Engine"]
         PolicyEngine -->|2. Consume Credit| LocalLimiter["Local Limiter (Token Bucket / Lease)"]
         LocalLimiter -->|3. Record Allowed/Denied| TelemetryStore["CRDT Telemetry Store (G-Counter)"]
         LocalLimiter -->|4. Decision (200 / 429)| NodeHTTP
-        
+
         subgraph BackgroundWorkers["Background Async Workers"]
             LeaseWorker["Lease Manager Worker"]
             GossipWorker["Anti-Entropy Gossip Worker"]
         end
-        
+
         LocalLimiter -.->|Low-water trigger| LeaseWorker
         TelemetryStore -.->|Periodic anti-entropy| GossipWorker
     end
-    
+
     subgraph ControlPlane["Quota Allocator (Control Plane)"]
         AllocatorServer["Allocator gRPC Service"]
         EscrowLedger["Escrow Ledger & Invariant Guard"]
         GlobalBucket["Global Refill Token Bucket"]
-        
+
         AllocatorServer --> EscrowLedger
         EscrowLedger --> GlobalBucket
     end
-    
+
     subgraph PeerNodes["Peer Cluster Nodes"]
         PeerNode1["Peer Node B"]
         PeerNode2["Peer Node C"]
     end
-    
+
     LeaseWorker ==="Async Lease Request / Monotonic Report (gRPC)"===> AllocatorServer
     GossipWorker <.-."Asynchronous CRDT State Sync (gRPC)".-> PeerNode1
     GossipWorker <.-."Asynchronous CRDT State Sync (gRPC)".-> PeerNode2
@@ -164,12 +164,12 @@ go test -v ./tests/hardening/...
 
 ## Repository Documentation Index
 
-- [Architecture Guide](docs/architecture.md) â€” Subsystem designs, component models, and data flows.
-- [Formal Invariants](docs/invariants.md) â€” Mathematical proofs and conservation guarantees.
-- [Wire Protocol Specification](docs/protocol.md) â€” gRPC schemas, HTTP endpoints, and RFC 6585 compliance.
-- [Failure Modes & Degraded States](docs/failure-modes.md) â€” Partition, node crash, and recovery behaviors.
-- [Benchmark Methodology](docs/benchmark-methodology.md) â€” Measurement methodology and percentile calculations.
-- [Benchmark Report](docs/benchmark-report.md) â€” Exact machine-generated results and platform metadata.
-- [Architecture Decision Log](docs/decision-log.md) â€” ADRs covering escrow design, reporting, and transport.
-- [Limitations & Trade-offs](docs/limitations.md) â€” Candid analysis of safety vs availability and in-memory control plane.
-- [Interactive Demo Walkthrough](docs/demo-script.md) â€” Step-by-step 60-90s scripted guide.
+- [Architecture Guide](docs/architecture.md) — Subsystem designs, component models, and data flows.
+- [Formal Invariants](docs/invariants.md) — Mathematical proofs and conservation guarantees.
+- [Wire Protocol Specification](docs/protocol.md) — gRPC schemas, HTTP endpoints, and RFC 6585 compliance.
+- [Failure Modes & Degraded States](docs/failure-modes.md) — Partition, node crash, and recovery behaviors.
+- [Benchmark Methodology](docs/benchmark-methodology.md) — Measurement methodology and percentile calculations.
+- [Benchmark Report](docs/benchmark-report.md) — Exact machine-generated results and platform metadata.
+- [Architecture Decision Log](docs/decision-log.md) — ADRs covering escrow design, reporting, and transport.
+- [Limitations & Trade-offs](docs/limitations.md) — Candid analysis of safety vs availability and in-memory control plane.
+- [Interactive Demo Walkthrough](docs/demo-script.md) — Step-by-step 60-90s scripted guide.
